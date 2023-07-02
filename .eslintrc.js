@@ -262,7 +262,7 @@ module.exports = {
         allowArrowFunctions: true
       }
     ],
-    "function-paren-newline": "error",
+    // "function-paren-newline": "error",
     "id-blacklist": "error",
     "id-length": [
       "error",
@@ -379,7 +379,7 @@ module.exports = {
       }
     ],
     "object-curly-spacing": ["error", "always"],
-    "object-property-newline": "error",
+    // "object-property-newline": "error",
     "one-var": ["error", "never"],
     "one-var-declaration-per-line": "error",
     "operator-assignment": "error",

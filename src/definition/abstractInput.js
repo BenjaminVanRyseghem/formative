@@ -20,6 +20,14 @@ export default class AbstractInput {
     return this._label;
   }
 
+  shouldShow(options) {
+    if (typeof this._showFn === "function") {
+      return this._showFn(options);
+    }
+
+    return this._showFn;
+  }
+
   accept(renderer, options) {
     return renderer.visitAbstractInput(this, options);
   }

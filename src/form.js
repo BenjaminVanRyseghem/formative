@@ -4,13 +4,12 @@ import objectPath from "object-path";
  * TODO: Write jsdoc
  */
 export default class Form {
-  constructor({ spec, state, validation, onSubmit }) {
+  constructor({ spec, state = {}, validation, onSubmit }) {
     this._spec = spec;
-    this._state = state;
+    this._state = { ...state };
     this._validation = validation;
     this._onSubmit = onSubmit;
-
-    this._pendingState = { ...state };
+    this._originalState = state;
   }
 
   getSpec() {
@@ -22,16 +21,23 @@ export default class Form {
   }
 
   setValueFor(id, value) {
-    return objectPath.set(this._pendingState, id, value);
+    return objectPath.set(this._state, id, value);
+  }
+
+  getState() {
+    return this._state;
   }
 
   isRequired(id) {
+    if (!this._validation) return false;
+
     let validation = objectPath.get(this._validation, id);
+    if (!validation) return false;
     return validation.$_getFlag("presence") === "required";
   }
 
   submit() {
-    let result = this._pendingState;
+    let result = this._state;
 
     if (this._validation) {
       let errors = this._validateFields({

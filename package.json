@@ -1,7 +1,6 @@
 {
-  "name": "formative",
-  "version": "1.0.0",
-  "description": "",
+  "name": "formidability",
+  "version": "0.0.2",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -9,8 +8,6 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "author": "Benjamin Van Ryseghem <benjamin.vanryseghem@gmail.com> (https://benjamin.vanryseghem.com/)",
-  "license": "ISC",
   "devDependencies": {
     "@storybook/addon-actions": "^7.0.24",
     "@storybook/addon-essentials": "^7.0.24",
@@ -33,5 +30,16 @@
   "dependencies": {
     "joi": "^17.9.2",
     "object-path": "^0.11.8"
-  }
+  },
+  "author": "Benjamin Van Ryseghem <benjamin.vanryseghem@gmail.com> (https://benjamin.vanryseghem.com/)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenjaminVanRyseghem/formidability.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BenjaminVanRyseghem/formidability/issues"
+  },
+  "homepage": "https://github.com/BenjaminVanRyseghem/formidability#readme",
+  "description": ""
 }

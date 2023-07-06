@@ -1,13 +1,18 @@
+import joi from "joi";
 import objectPath from "object-path";
+
+const validationOptions = {
+  allowUnknown: true
+};
 
 /**
  * TODO: Write jsdoc
  */
 export default class Form {
-  constructor({ spec, state = {}, validation, onSubmit }) {
+  constructor({ spec, state = {}, validator, onSubmit }) {
     this._spec = spec;
     this._state = { ...state };
-    this._validation = validation;
+    this._validator = validator;
     this._onSubmit = onSubmit;
     this._originalState = state;
   }
@@ -29,58 +34,85 @@ export default class Form {
   }
 
   isRequired(id) {
-    if (!this._validation) return false;
+    if (!this._validator) return false;
 
-    let validation = objectPath.get(this._validation, id);
-    if (!validation) return false;
-    return validation.$_getFlag("presence") === "required";
+    let validator = objectPath.get(this._validator, id);
+    if (!validator) return false;
+    return validator.$_getFlag("presence") === "required";
+  }
+
+  makeValidateFor(id) {
+    return (value) => {
+      let validator = objectPath.get(this._validator, id);
+      let input = this._findInputWithId(id);
+
+      if (!validator) return null;
+
+      let namedValidator = validator.label(input.getLabel());
+      return namedValidator.validate(value, validationOptions);
+    };
+  }
+
+  _findInputWithId(id) {
+    for (let input of this._spec) {
+      let found = input.findInputWithId(id);
+      if (found) return found;
+    }
+
+    return null;
   }
 
   submit() {
     let result = this._state;
 
-    if (this._validation) {
-      let errors = this._validateFields({
-        fields: Object.keys(this._validation),
-        state: result
-      });
+    if (this._validator) {
+      let namedValidation = this._appendLabelsToValidators();
+      let { error, value } = joi
+        .object(namedValidation)
+        .validate(result, { ...validationOptions, abortEarly: false });
 
-      if (Object.keys(errors).length) {
-        return errors;
-      }
+      if (error) return gatherErrors(error);
+      this._onSubmit?.(value);
+      return null;
     }
 
     this._onSubmit?.(result);
     return null;
   }
 
-  _validateFields({ fields, state, prefix = "", errors = {} }) {
-    for (let field of fields) {
-      let key = `${prefix}${field}`;
-      let validator = objectPath.get(this._validation, key);
-      if (isObject(validator)) {
-        this._validateFields({
-          fields: Object.keys(validator),
-          state,
-          prefix: `${key}.`,
-          errors
-        });
-      } else {
-        let { error } = validator.validate(objectPath.get(state, key), {
-          errors: {
-            label: false
-          }
-        });
-        if (error) {
-          errors[key] = error;
-        }
-      }
+  forEachInput(fn) {
+    for (let input of this._spec) {
+      input.forEach(fn);
     }
+  }
 
-    return errors;
+  _appendLabelsToValidators() {
+    let result = {};
+
+    this.forEachInput((input) => {
+      let id = input.getId();
+      let validator = objectPath.get(this._validator, id);
+      if (!validator) return;
+
+      let namedValidator = validator.label(input.getLabel());
+      objectPath.set(result, id, namedValidator);
+    });
+
+    return result;
   }
 }
 
-function isObject(validator) {
-  return typeof validator === "object" && !validator.$;
+/**
+ *
+ * @param error
+ * @return {{}}
+ */
+function gatherErrors(error) {
+  let result = {};
+
+  for (let detail of error.details) {
+    result[detail.path.join(".")] = detail;
+  }
+
+  return result;
 }

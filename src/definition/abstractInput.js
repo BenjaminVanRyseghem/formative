@@ -31,4 +31,12 @@ export default class AbstractInput {
   accept(renderer, options) {
     return renderer.visitAbstractInput(this, options);
   }
+
+  findInputWithId(id) {
+    return this._id === id ? this : null;
+  }
+
+  forEach(fn) {
+    fn(this);
+  }
 }

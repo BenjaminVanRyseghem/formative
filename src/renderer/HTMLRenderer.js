@@ -88,7 +88,7 @@ export default class HTMLRenderer extends AbstractRenderer {
   }
 
   _createInput(input, options) {
-    let { value, onChange, required } = options;
+    let { value, onChange, required, validate } = options;
     let base = this.visitAbstractInput(input, options);
 
     let node = document.createElement("input");
@@ -96,7 +96,16 @@ export default class HTMLRenderer extends AbstractRenderer {
       node.setAttribute("value", value);
     }
     node.addEventListener("keyup", (event) => {
+      if (event.key === "Tab") return;
       onChange(event.target.value);
+    });
+
+    node.addEventListener("focus", () => {
+      this._clearErrorFor(input.getId());
+    });
+
+    node.addEventListener("blur", (event) => {
+      validate(event.target.value);
     });
 
     if (required) {
@@ -192,6 +201,14 @@ export default class HTMLRenderer extends AbstractRenderer {
     for (let error of errors) {
       error.innerHTML = "";
     }
+  }
+
+  _clearErrorFor(id) {
+    let errorContainer = this._formNode.querySelector(
+      `[data-id='${id}'] .error-container`
+    );
+    if (!errorContainer) return;
+    errorContainer.innerHTML = "";
   }
 
   _appendError(key, error) {

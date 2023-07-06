@@ -35,9 +35,9 @@ export const Default = {
         gender: "female"
       }
     },
-    validation: {
+    validator: {
       info: {
-        name: joi.string().empty("").required(),
+        name: joi.string().empty("").required().trim(),
         lastName: joi.string().empty("").required()
       }
     }

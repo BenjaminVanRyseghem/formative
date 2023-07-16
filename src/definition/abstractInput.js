@@ -7,8 +7,32 @@ export default class AbstractInput {
     this._showFn = showFn;
   }
 
+  transform(fn) {
+    this._transformFn = fn;
+    return this;
+  }
+
+  getTransformFn() {
+    return this._transformFn;
+  }
+
+  format(fn) {
+    this._formatFn = fn;
+    return this;
+  }
+
+  getFormatFn() {
+    return this._formatFn;
+  }
+
   getId() {
-    return this._id;
+    if (!this._parentId) return this._id;
+
+    return `${this._parentId}.${this._id}`;
+  }
+
+  setParentId(id) {
+    this._parentId = id;
   }
 
   label(label) {
@@ -16,8 +40,8 @@ export default class AbstractInput {
     return this;
   }
 
-  getLabel() {
-    return this._label;
+  getLabel(options) {
+    return this._resolve(this._label, options);
   }
 
   shouldShow(options) {
@@ -32,11 +56,23 @@ export default class AbstractInput {
     return renderer.visitAbstractInput(this, options);
   }
 
-  findInputWithId(id) {
-    return this._id === id ? this : null;
+  isRequired({ form }) {
+    return form.isRequired(this.getId());
   }
 
-  forEach(fn) {
-    fn(this);
+  findInputWithId(id) {
+    return this.getId() === id ? this : null;
+  }
+
+  forEach(fn, options) {
+    fn(this, options);
+  }
+
+  _resolve(objectOrFunction, options = {}) {
+    if (typeof objectOrFunction === "function") {
+      return objectOrFunction(options);
+    }
+
+    return objectOrFunction;
   }
 }

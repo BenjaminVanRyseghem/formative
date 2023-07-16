@@ -38,15 +38,10 @@ export default class HTMLRenderer extends AbstractRenderer {
     let result = document.createElement("div");
     result.setAttribute("data-id", input.getId());
 
-    let label = input.getLabel();
+    let label = input.getLabel(options);
     if (label) {
       let labelNode = document.createElement("label");
-      labelNode.innerHTML = label;
-
-      if (required) {
-        labelNode.innerHTML += "*";
-      }
-
+      this._renderLabel(labelNode, label, required);
       result.appendChild(labelNode);
     }
 
@@ -82,6 +77,45 @@ export default class HTMLRenderer extends AbstractRenderer {
     return this._createSelect(input, options);
   }
 
+  visitGroup(input, options) {
+    let existingNode = this._findNode(input, options);
+    if (existingNode) {
+      this._updateGroup(input, existingNode, options);
+      return existingNode;
+    }
+
+    return this._createGroup(input, options);
+  }
+
+  _createGroup(input, options) {
+    let children = super.visitGroup(input, options);
+    let base = this.visitAbstractInput(input, options);
+
+    let node = document.createElement("section");
+    node.setAttribute("data-input", "true");
+
+    for (let child of children) {
+      node.appendChild(child);
+    }
+
+    if (options.required) {
+      node.setAttribute("required", "true");
+    }
+
+    base.insertBefore(node, base.lastChild);
+
+    return base;
+  }
+
+  _renderLabel(node, label, required) {
+    if (!node) return;
+    node.innerHTML = label;
+
+    if (required) {
+      node.innerHTML += "*";
+    }
+  }
+
   _stateChanged() {
     super._stateChanged();
     this._visitSpec(this._form);
@@ -92,6 +126,8 @@ export default class HTMLRenderer extends AbstractRenderer {
     let base = this.visitAbstractInput(input, options);
 
     let node = document.createElement("input");
+    node.setAttribute("data-input", "true");
+
     if (value !== undefined && value !== "") {
       node.setAttribute("value", value);
     }
@@ -121,8 +157,12 @@ export default class HTMLRenderer extends AbstractRenderer {
     let { value } = options;
     let shouldShow = input.shouldShow(options);
 
+    let label = input.getLabel(options);
+    let existingLabel = existingNode.querySelector("label");
+    this._renderLabel(existingLabel, label, options.required);
+
     if (value !== undefined && value !== "") {
-      existingNode.setAttribute("value", value);
+      existingNode.querySelector("[data-input]").value = value;
     }
 
     if (shouldShow) {
@@ -137,6 +177,7 @@ export default class HTMLRenderer extends AbstractRenderer {
     let base = this.visitAbstractInput(input, options);
 
     let node = document.createElement("select");
+    node.setAttribute("data-input", "true");
 
     if (value !== undefined && value !== "") {
       node.setAttribute("value", value);
@@ -178,18 +219,12 @@ export default class HTMLRenderer extends AbstractRenderer {
   }
 
   _updateSelect(input, existingNode, options) {
-    let { value } = options;
-    let shouldShow = input.shouldShow(options);
+    this._updateInput(input, existingNode, options);
+  }
 
-    if (value !== undefined && value !== "") {
-      existingNode.setAttribute("value", value);
-    }
-
-    if (shouldShow) {
-      existingNode.style.display = "initial";
-    } else {
-      existingNode.style.display = "none";
-    }
+  _updateGroup(input, existingNode, options) {
+    super.visitGroup(input, options);
+    this._updateInput(input, existingNode, options);
   }
 
   _findNode(input) {

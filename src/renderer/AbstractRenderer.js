@@ -16,9 +16,13 @@ export default class AbstractRenderer {
 
   visitAbstractInput(input, options) {}
 
+  visitInput(input, options) {}
+
   visitSelect(input, options) {}
 
-  visitInput(input, options) {}
+  visitGroup(input, options) {
+    return this._visitAllInputs(input.getChildren(options), options);
+  }
 
   _visitForm(form) {
     this._form = form;
@@ -27,10 +31,13 @@ export default class AbstractRenderer {
 
   _visitAllInputs(array, baseOptions) {
     return array.map((each) => {
-      let value = this._getValueFor(each.getId());
-      let onChange = this._makeOnChangeFor(each.getId());
-      let required = this._isRequired(each.getId());
-      let validate = this._makeValidateFor(each.getId());
+      let value = this._getValueFor(each, baseOptions);
+      let onChange = this._makeOnChangeFor(each, baseOptions);
+      let required = each.isRequired({
+        form: this._form,
+        options: baseOptions
+      });
+      let validate = this._makeValidateFor(each.getId(), baseOptions);
 
       let options = Object.assign({}, baseOptions, {
         value,
@@ -48,8 +55,8 @@ export default class AbstractRenderer {
     return this._visitAllInputs(spec, { state: form.getState() });
   }
 
-  _getValueFor(id) {
-    return this._form.getValueFor(id);
+  _getValueFor(input, options) {
+    return this._form.getValueFor(input, options);
   }
 
   _makeValidateFor(id) {
@@ -65,11 +72,17 @@ export default class AbstractRenderer {
     };
   }
 
-  _makeOnChangeFor(id) {
+  _makeOnChangeFor(input, options) {
     return (valueToValidate) => {
-      let result = this._validateValue(id, valueToValidate);
+      let id = input.getId();
+      let transformFn = input.getTransformFn();
+      let transformedValue = transformFn
+        ? transformFn(valueToValidate, options)
+        : valueToValidate;
+
+      let result = this._validateValue(id, transformedValue);
       let error = result?.error;
-      let value = result?.value ?? valueToValidate;
+      let value = result?.value ?? transformedValue;
 
       this._form.setValueFor(id, value);
       this._stateChanged();
@@ -84,10 +97,6 @@ export default class AbstractRenderer {
 
   _validateValue(id, value) {
     return this._form.makeValidateFor(id)(value);
-  }
-
-  _isRequired(id) {
-    return this._form.isRequired(id);
   }
 
   _submit() {

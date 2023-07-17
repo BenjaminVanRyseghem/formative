@@ -1,9 +1,9 @@
-import AbstractRenderer from "./AbstractRenderer";
+import AbstractRenderer from "./abstractRenderer";
 
 /**
  *
  */
-export default class HTMLRenderer extends AbstractRenderer {
+export default class HtmlRenderer extends AbstractRenderer {
   _visitForm(form) {
     super._visitForm(form);
 
@@ -17,6 +17,12 @@ export default class HTMLRenderer extends AbstractRenderer {
       }
     }
 
+    result.appendChild(this._createSubmitButton());
+
+    return result;
+  }
+
+  _createSubmitButton() {
     let button = document.createElement("button");
     button.setAttribute("type", "button");
     button.innerHTML = "Submit";
@@ -26,9 +32,7 @@ export default class HTMLRenderer extends AbstractRenderer {
       this._submit();
     });
 
-    result.appendChild(button);
-
-    return result;
+    return button;
   }
 
   visitAbstractInput(input, options) {

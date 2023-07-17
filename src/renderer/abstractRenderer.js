@@ -2,6 +2,14 @@
  * TODO: Write jsdoc
  */
 export default class AbstractRenderer {
+  constructor({ plugins = [] } = {}) {
+    this._plugins = [...(this.constructor.plugins ?? []), ...plugins];
+
+    for (let plugin of this._plugins) {
+      plugin.register(this);
+    }
+  }
+
   render(form) {
     return this._visitForm(form);
   }
@@ -121,4 +129,10 @@ export default class AbstractRenderer {
   _clearErrorFor(id) {}
 
   _appendError(key, error) {}
+
+  static plugin(plugin) {
+    this.plugins ??= [];
+    this.plugins.push(plugin);
+    return this;
+  }
 }

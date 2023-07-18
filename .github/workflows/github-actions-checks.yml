@@ -1,0 +1,27 @@
+name: Check the PR
+run-name: Checking the PR 🔍
+on: pull_request
+env:
+  NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  FINSIT_GITHUB: ${{secrets.FINSIT_GITHUB}}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/Hydrogen
+      - name: Run install
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: install
+      - name: Lint
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: lint
+      - name: Test
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: test

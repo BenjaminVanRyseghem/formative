@@ -1,0 +1,46 @@
+name: Build the lib
+run-name: ${{ github.actor }} is rolling up our design-system 🚀
+on:
+  release:
+    types: [ created ]
+env:
+  NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  FINSIT_GITHUB: ${{secrets.FINSIT_GITHUB}}
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/Hydrogen
+          registry-url: https://npm.pkg.github.com/
+      - name: Restore cached yarn
+        id: cache-yarn-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: ./yarn-cache
+          key: ${{ github.ref }}-yarn
+      - name: Run install
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: install --frozen-lockfile --cache-folder ./yarn-cache
+      - name: Save cached yarn
+        id: cache-yarn-save
+        uses: actions/cache/save@v3
+        with:
+          path: ./yarn-cache
+          key: ${{ steps.cache-yarn-restore.outputs.cache-yarn-key }}
+      - name: Lint
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: lint
+      - name: Bundle
+        uses: Borales/actions-yarn@v4.2.0
+        with:
+          cmd: bundle
+      - run: cd ./build && npm publish

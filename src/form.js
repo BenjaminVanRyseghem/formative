@@ -1,155 +1,106 @@
-import joi, { valid } from "joi";
+import joi from "joi";
+import JoiValidation from "./validation/joiValidation";
+import JsonStateHandler from "./state/jsonStateHandler";
 import objectPath from "object-path";
 
 const validationOptions = {
-  allowUnknown: true
+	allowUnknown: true
 };
 
 /**
  * TODO: Write jsdoc
  */
 export default class Form {
-  constructor({ spec, state = {}, validator, onSubmit }) {
-    this._spec = spec;
-    this._state = { ...state };
-    this._validator = validator;
-    this._onSubmit = onSubmit;
-    this._originalState = state;
-  }
+	constructor({
+		spec,
+		state = {},
+		validator,
+		stateHandler = new JsonStateHandler(),
+		validation = new JoiValidation(),
+		onSubmit
+	}) {
+		this._spec = spec;
+		this._validator = validator;
+		this._onSubmit = onSubmit;
+		this._stateHandler = stateHandler;
+		this._state = this._stateHandler.clone(state);
+		this._validation = validation;
+		this._originalState = state;
+	}
 
-  getSpec() {
-    return this._spec;
-  }
+	getSpec() {
+		return this._spec;
+	}
 
-  getValueFor(input, options) {
-    let id = input.getId();
-    let baseValue = objectPath.get(this._state, id);
-    let formatFn = input.getFormatFn();
-    if (!formatFn) return baseValue;
-    return formatFn(baseValue, options);
-  }
+	getValueFor(input, options) {
+		let id = input.getId();
+		let baseValue = this._stateHandler.get(this._state, id);
+		let formatFn = input.getFormatFn();
+		if (!formatFn) return baseValue;
+		return formatFn(baseValue, options);
+	}
 
-  setValueFor(id, value) {
-    return objectPath.set(this._state, id, value);
-  }
+	setValueFor(id, value) {
+		this._stateHandler.set(this._state, id, value);
+	}
 
-  getState() {
-    return this._state;
-  }
+	getState() {
+		return this._state;
+	}
 
-  isRequired(id) {
-    if (!this._validator) return false;
+	resetState() {
+		this._state = this._stateHandler.clone(this._originalState);
+	}
 
-    let allValues = structuredClone(this._state);
-    objectPath.set(allValues, id, undefined);
+	isRequired(id) {
+		if (!this._validator) return false;
 
-    let result = joi.compile(this._validator).validate(allValues, {
-      ...validationOptions,
-      abortEarly: false,
-      errors: {
-        render: false,
-        stack: false,
-        wrap: false
-      }
-    });
+		return this._validation.isRequired({
+			id,
+			stateHandler: this._stateHandler,
+			state: this._state,
+			validator: this._validator
+		});
+	}
 
-    let error = result.error?.details?.find(
-      (detail) => detail.path.join(".") === id
-    );
+	makeValidateFor(id) {
+		return (value) => {
+			if (!this._validator) {
+				return {};
+			}
 
-    if (!error) return false;
+			return this._validation.makeValidateFor({
+				id,
+				value,
+				stateHandler: this._stateHandler,
+				state: this._state,
+				validator: this._validator,
+				form: this
+			});
+		};
+	}
 
-    return error.type === "any.required";
-  }
+	submit() {
+		let result = this._state;
 
-  makeValidateFor(id) {
-    return (value) => {
-      if (!this._validator) {
-        return {};
-      }
+		if (this._validator) {
+			let errors = this._validation.validate({
+				state: this._state,
+				stateHandler: this._stateHandler,
+				validator: this._validator,
+				form: this
+			});
 
-      let allValues = structuredClone(this._state);
-      objectPath.set(allValues, id, value);
+			if (errors) return errors;
+		}
 
-      let namedValidation = this._appendLabelsToValidators();
-      let result = joi
-        .compile(namedValidation)
-        .validate(allValues, { ...validationOptions, abortEarly: false });
+		this._onSubmit?.(result);
+		return null;
+	}
 
-      return {
-        error: result.error?.details?.find(
-          (detail) => detail.path.join(".") === id
-        ),
-        value: result.value ? objectPath.get(result.value, id) : undefined
-      };
-    };
-  }
-
-  _findInputWithId(id, options) {
-    for (let input of this._spec) {
-      let found = input.findInputWithId(id, options);
-      if (found) return found;
-    }
-
-    return null;
-  }
-
-  submit() {
-    let result = this._state;
-
-    if (this._validator) {
-      let namedValidation = this._appendLabelsToValidators();
-      let { error, value } = joi
-        .compile(namedValidation)
-        .validate(result, { ...validationOptions, abortEarly: false });
-
-      if (error) return gatherErrors(error);
-      this._onSubmit?.(value);
-      return null;
-    }
-
-    this._onSubmit?.(result);
-    return null;
-  }
-
-  forEachInput(fn) {
-    for (let input of this._spec) {
-      input.forEach(fn, { state: this._state });
-    }
-  }
-
-  _appendLabelsToValidators() {
-    let result = {};
-
-    this.forEachInput((input, options) => {
-      let id = input.getId();
-      let validator = objectPath.get(this._validator, id);
-      if (!validator) return;
-
-      let label = input.getLabel(options);
-
-      let namedValidator = label
-        ? validator.label(input.getLabel())
-        : validator;
-
-      objectPath.set(result, id, namedValidator);
-    });
-
-    return result;
-  }
-}
-
-/**
- *
- * @param error
- * @return {{}}
- */
-function gatherErrors(error) {
-  let result = {};
-
-  for (let detail of error.details) {
-    result[detail.path.join(".")] = detail;
-  }
-
-  return result;
+	forEachInput(fn) {
+		for (let input of this._spec) {
+			input.forEach(fn, { state: this._state });
+		}
+	}
 }

@@ -4,257 +4,259 @@ import AbstractRenderer from "./abstractRenderer";
  *
  */
 export default class HtmlRenderer extends AbstractRenderer {
-  _visitForm(form) {
-    super._visitForm(form);
+	_visitForm(form) {
+		super._visitForm(form);
 
-    let result = document.createElement("form");
-    this._formNode = result;
+		let result = document.createElement("form");
+		this._formNode = result;
 
-    let children = this._visitSpec(form);
-    for (let child of children) {
-      if (child) {
-        result.appendChild(child);
-      }
-    }
+		let children = this._visitSpec(form);
+		for (let child of children) {
+			if (child) {
+				result.appendChild(child);
+			}
+		}
 
-    result.appendChild(this._createSubmitButton());
+		result.appendChild(this._createSubmitButton());
 
-    return result;
-  }
+		return result;
+	}
 
-  _createSubmitButton() {
-    let button = document.createElement("button");
-    button.setAttribute("type", "button");
-    button.innerHTML = "Submit";
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      event.preventDefault();
-      this._submit();
-    });
+	_createSubmitButton() {
+		let button = document.createElement("button");
+		button.setAttribute("type", "button");
+		button.innerHTML = "Submit";
 
-    return button;
-  }
+		button.addEventListener("click", (event) => {
+			event.stopPropagation();
+			event.preventDefault();
+			this._submit();
+		});
 
-  visitAbstractInput(input, options) {
-    let shouldShow = input.shouldShow(options);
+		return button;
+	}
 
-    let { required } = options;
-    let result = document.createElement("div");
-    result.setAttribute("data-id", input.getId());
+	visitAbstractInput(input, options) {
+		let shouldShow = input.shouldShow(options);
 
-    let label = input.getLabel(options);
-    if (label) {
-      let labelNode = document.createElement("label");
-      this._renderLabel(labelNode, label, required);
-      result.appendChild(labelNode);
-    }
+		let { required } = options;
+		let result = document.createElement("div");
+		result.setAttribute("data-id", input.getId());
 
-    let errorNode = document.createElement("div");
-    errorNode.classList.add("error-container");
+		let label = input.getLabel(options);
+		if (label) {
+			let labelNode = document.createElement("label");
+			this._renderLabel(labelNode, label, required);
+			result.appendChild(labelNode);
+		}
 
-    result.appendChild(errorNode);
+		let errorNode = document.createElement("div");
+		errorNode.classList.add("error-container");
 
-    if (!shouldShow) {
-      result.style.display = "none";
-    }
+		result.appendChild(errorNode);
 
-    return result;
-  }
+		if (!shouldShow) {
+			result.style.display = "none";
+		}
 
-  visitInput(input, options) {
-    let existingNode = this._findNode(input);
-    if (existingNode) {
-      this._updateInput(input, existingNode, options);
-      return existingNode;
-    }
+		return result;
+	}
 
-    return this._createInput(input, options);
-  }
+	visitInput(input, options) {
+		let existingNode = this._findNode(input);
+		if (existingNode) {
+			this._updateInput(input, existingNode, options);
+			return existingNode;
+		}
 
-  visitSelect(input, options) {
-    let existingNode = this._findNode(input);
-    if (existingNode) {
-      this._updateSelect(input, existingNode, options);
-      return existingNode;
-    }
+		return this._createInput(input, options);
+	}
 
-    return this._createSelect(input, options);
-  }
+	visitSelect(input, options) {
+		let existingNode = this._findNode(input);
+		if (existingNode) {
+			this._updateSelect(input, existingNode, options);
+			return existingNode;
+		}
 
-  visitGroup(input, options) {
-    let existingNode = this._findNode(input, options);
-    if (existingNode) {
-      this._updateGroup(input, existingNode, options);
-      return existingNode;
-    }
+		return this._createSelect(input, options);
+	}
 
-    return this._createGroup(input, options);
-  }
+	visitGroup(input, options) {
+		let existingNode = this._findNode(input, options);
+		if (existingNode) {
+			this._updateGroup(input, existingNode, options);
+			return existingNode;
+		}
 
-  _createGroup(input, options) {
-    let children = super.visitGroup(input, options);
-    let base = this.visitAbstractInput(input, options);
+		return this._createGroup(input, options);
+	}
 
-    let node = document.createElement("section");
-    node.setAttribute("data-input", "true");
+	_createGroup(input, options) {
+		let children = super.visitGroup(input, options);
+		let base = this.visitAbstractInput(input, options);
 
-    for (let child of children) {
-      node.appendChild(child);
-    }
+		let node = document.createElement("section");
+		node.setAttribute("data-input", "true");
 
-    if (options.required) {
-      node.setAttribute("required", "true");
-    }
+		for (let child of children) {
+			node.appendChild(child);
+		}
 
-    base.insertBefore(node, base.lastChild);
+		if (options.required) {
+			node.setAttribute("required", "true");
+		}
 
-    return base;
-  }
+		base.insertBefore(node, base.lastChild);
 
-  _renderLabel(node, label, required) {
-    if (!node) return;
-    node.innerHTML = label;
+		return base;
+	}
 
-    if (required) {
-      node.innerHTML += "*";
-    }
-  }
+	_renderLabel(node, label, required) {
+		if (!node) return;
+		node.innerHTML = label;
 
-  _stateChanged() {
-    super._stateChanged();
-    this._visitSpec(this._form);
-  }
+		if (required) {
+			node.innerHTML += "*";
+		}
+	}
 
-  _createInput(input, options) {
-    let { value, onChange, required, validate } = options;
-    let base = this.visitAbstractInput(input, options);
+	_stateChanged() {
+		super._stateChanged();
+		this._visitSpec(this._form);
+	}
 
-    let node = document.createElement("input");
-    node.setAttribute("data-input", "true");
+	_createInput(input, options) {
+		let { value, onChange, required, validate } = options;
+		let base = this.visitAbstractInput(input, options);
 
-    if (value !== undefined && value !== "") {
-      node.setAttribute("value", value);
-    }
-    node.addEventListener("keyup", (event) => {
-      if (event.key === "Tab") return;
-      onChange(event.target.value);
-    });
+		let node = document.createElement("input");
+		node.setAttribute("data-input", "true");
 
-    node.addEventListener("focus", () => {
-      this._clearErrorFor(input.getId());
-    });
+		if (value !== undefined && value !== "") {
+			node.setAttribute("value", value);
+		}
 
-    node.addEventListener("blur", (event) => {
-      validate(event.target.value);
-    });
+		node.addEventListener("keyup", (event) => {
+			if (event.key === "Tab") return;
+			onChange(event.target.value);
+		});
 
-    if (required) {
-      node.setAttribute("required", "true");
-    }
+		node.addEventListener("focus", () => {
+			this._clearErrorFor(input.getId());
+		});
 
-    base.insertBefore(node, base.lastChild);
+		node.addEventListener("blur", (event) => {
+			validate(event.target.value);
+		});
 
-    return base;
-  }
+		if (required) {
+			node.setAttribute("required", "true");
+		}
 
-  _updateInput(input, existingNode, options) {
-    let { value } = options;
-    let shouldShow = input.shouldShow(options);
+		base.insertBefore(node, base.lastChild);
 
-    let label = input.getLabel(options);
-    let existingLabel = existingNode.querySelector("label");
-    this._renderLabel(existingLabel, label, options.required);
+		return base;
+	}
 
-    if (value !== undefined && value !== "") {
-      existingNode.querySelector("[data-input]").value = value;
-    }
+	_updateInput(input, existingNode, options) {
+		let { value } = options;
+		let shouldShow = input.shouldShow(options);
 
-    if (shouldShow) {
-      existingNode.style.display = "initial";
-    } else {
-      existingNode.style.display = "none";
-    }
-  }
+		let label = input.getLabel(options);
+		let existingLabel = existingNode.querySelector("label");
+		this._renderLabel(existingLabel, label, options.required);
 
-  _createSelect(input, options) {
-    let { value, onChange, required } = options;
-    let base = this.visitAbstractInput(input, options);
+		if (value !== undefined && value !== "") {
+			existingNode.querySelector("[data-input]").value = value;
+		}
 
-    let node = document.createElement("select");
-    node.setAttribute("data-input", "true");
+		if (shouldShow) {
+			existingNode.style.display = "initial";
+		} else {
+			existingNode.style.display = "none";
+		}
+	}
 
-    if (value !== undefined && value !== "") {
-      node.setAttribute("value", value);
-    }
+	_createSelect(input, options) {
+		let { value, onChange, required } = options;
+		let base = this.visitAbstractInput(input, options);
 
-    let selectedFound = false;
+		let node = document.createElement("select");
+		node.setAttribute("data-input", "true");
 
-    let selectOptions = input.getOptions();
-    for (let option of selectOptions) {
-      let optionNode = document.createElement("option");
-      optionNode.innerHTML = option.label;
-      optionNode.value = option.value;
+		if (value !== undefined && value !== "") {
+			node.setAttribute("value", value);
+		}
 
-      if (value === option.value) {
-        optionNode.setAttribute("selected", "true");
-        selectedFound = true;
-      }
+		let selectedFound = false;
 
-      node.appendChild(optionNode);
-    }
+		let selectOptions = input.getOptions();
+		for (let option of selectOptions) {
+			let optionNode = document.createElement("option");
+			optionNode.innerHTML = option.label;
+			optionNode.value = option.value;
 
-    if (!selectedFound) {
-      setTimeout(() => {
-        onChange(selectOptions[0].value);
-      }, 0);
-    }
+			if (value === option.value) {
+				optionNode.setAttribute("selected", "true");
+				selectedFound = true;
+			}
 
-    node.addEventListener("change", (event) => {
-      onChange(event.target.value);
-    });
+			node.appendChild(optionNode);
+		}
 
-    if (required) {
-      node.setAttribute("required", "true");
-    }
+		if (!selectedFound) {
+			setTimeout(() => {
+				onChange(selectOptions[0].value);
+			}, 0);
+		}
 
-    base.insertBefore(node, base.lastChild);
+		node.addEventListener("change", (event) => {
+			onChange(event.target.value);
+		});
 
-    return base;
-  }
+		if (required) {
+			node.setAttribute("required", "true");
+		}
 
-  _updateSelect(input, existingNode, options) {
-    this._updateInput(input, existingNode, options);
-  }
+		base.insertBefore(node, base.lastChild);
 
-  _updateGroup(input, existingNode, options) {
-    super.visitGroup(input, options);
-    this._updateInput(input, existingNode, options);
-  }
+		return base;
+	}
 
-  _findNode(input) {
-    return this._formNode.querySelector(`[data-id='${input.getId()}']`);
-  }
+	_updateSelect(input, existingNode, options) {
+		this._updateInput(input, existingNode, options);
+	}
 
-  _clearAllErrors() {
-    let errors = this._formNode.querySelectorAll(".error-container");
-    for (let error of errors) {
-      error.innerHTML = "";
-    }
-  }
+	_updateGroup(input, existingNode, options) {
+		super.visitGroup(input, options);
+		this._updateInput(input, existingNode, options);
+	}
 
-  _clearErrorFor(id) {
-    let errorContainer = this._formNode.querySelector(
-      `[data-id='${id}'] .error-container`
-    );
-    if (!errorContainer) return;
-    errorContainer.innerHTML = "";
-  }
+	_findNode(input) {
+		return this._formNode.querySelector(`[data-id='${input.getId()}']`);
+	}
 
-  _appendError(key, error) {
-    let errorNode = this._formNode.querySelector(
-      `[data-id='${key}'] .error-container`
-    );
+	_clearAllErrors() {
+		let errors = this._formNode.querySelectorAll(".error-container");
+		for (let error of errors) {
+			error.innerHTML = "";
+		}
+	}
 
-    errorNode.innerHTML = error.message;
-  }
+	_clearErrorFor(id) {
+		let errorContainer = this._formNode.querySelector(
+			`[data-id='${id}'] .error-container`
+		);
+		if (!errorContainer) return;
+		errorContainer.innerHTML = "";
+	}
+
+	_appendError(key, error) {
+		let errorNode = this._formNode.querySelector(
+			`[data-id='${key}'] .error-container`
+		);
+
+		errorNode.innerHTML = error.message;
+	}
 }

@@ -1,17 +1,18 @@
 import { action } from "@storybook/addon-actions";
 import { spec, validator } from "./utilities";
+import { WeirdInput, WeirdPlugin } from "./weirdPlugin";
 import Form from "../src/form";
 import HtmlRenderer from "../src/renderer/htmlRenderer";
 
 export default {
 	title: "Example/Form",
-	render: createForm,
 	parameters: {
 		layout: "fullscreen"
 	}
 };
 
-export const Default = {
+export const WithCustomInput = {
+	render: createFormWithCustomInput,
 	args: {
 		spec,
 		state: {
@@ -25,11 +26,14 @@ export const Default = {
 	}
 };
 
-function createForm(args) {
-	let renderer = new HtmlRenderer();
+function createFormWithCustomInput(args) {
+	let renderer = new HtmlRenderer({ plugins: [new WeirdPlugin()] });
+	args.spec = [new WeirdInput("weird").label("Weird"), ...args.spec];
+
 	let form = new Form({
 		...args,
 		onSubmit: action("onSubmit")
 	});
+
 	return renderer.render(form);
 }

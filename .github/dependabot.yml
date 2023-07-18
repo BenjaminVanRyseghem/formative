@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    open-pull-requests-limit: 1000
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "19:00"
+      timezone: "Europe/Paris"
+    commit-message:
+      prefix: "[dependabot] "
+    labels:
+      - "dependencies"

@@ -22,11 +22,11 @@ export default class AbstractRenderer {
 		return entries.map((entry) => this.visit(entry, options));
 	}
 
-	visitAbstractInput(input, options) {}
+	visitAbstractInput(_input, _options) {}
 
-	visitInput(input, options) {}
+	visitInput(_input, _options) {}
 
-	visitSelect(input, options) {}
+	visitSelect(_input, _options) {}
 
 	visitGroup(input, options) {
 		return this._visitAllInputs(input.getChildren(options), options);
@@ -83,9 +83,9 @@ export default class AbstractRenderer {
 	_makeOnChangeFor(input, options) {
 		return (valueToValidate) => {
 			let id = input.getId();
-			let transformFn = input.getTransformFn();
-			let value = transformFn
-				? transformFn(valueToValidate, options)
+			let transformFunction = input.getTransformFn();
+			let value = transformFunction
+				? transformFunction(valueToValidate, options)
 				: valueToValidate;
 
 			let error = this._validateValue(id, value);
@@ -124,9 +124,9 @@ export default class AbstractRenderer {
 
 	_clearAllErrors() {}
 
-	_clearErrorFor(id) {}
+	_clearErrorFor(_id) {}
 
-	_appendError(key, error) {}
+	_appendError(_key, _error) {}
 
 	static plugin(plugin) {
 		this.plugins ??= [];

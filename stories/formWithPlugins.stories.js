@@ -15,9 +15,6 @@ export default {
 	}
 };
 
-/*
- *
- */
 class TestPlugin extends AbstractPlugin {
 	constructor(submitLabel = "") {
 		super(...arguments); // eslint-disable-line prefer-rest-params
@@ -25,12 +22,16 @@ class TestPlugin extends AbstractPlugin {
 	}
 
 	register(renderer) {
-		this.registerFunction(renderer, "_createSubmitButton", (baseFn) => {
-			let base = baseFn();
-			base.innerText += ` ${this._label}`;
+		this.registerFunction(
+			renderer,
+			"_createSubmitButton",
+			(baseFunction) => {
+				let base = baseFunction();
+				base.textContent += ` ${this._label}`;
 
-			return base;
-		});
+				return base;
+			}
+		);
 	}
 }
 
@@ -126,15 +127,6 @@ export const WithInstancePlugin = {
 		validator
 	}
 };
-
-function createForm(args) {
-	let renderer = new HtmlRenderer();
-	let form = new Form({
-		...args,
-		onSubmit: action("onSubmit")
-	});
-	return renderer.render(form);
-}
 
 function createFormWithClassPlugin(args) {
 	class TestRenderer extends HtmlRenderer {} // eslint-disable-line jsdoc/require-jsdoc

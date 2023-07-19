@@ -2,9 +2,9 @@
  * TODO: Write jsdoc
  */
 export default class AbstractInput {
-	constructor(id, showFn = () => true) {
+	constructor(id, showFunction = () => true) {
 		this._id = id;
-		this._showFn = showFn;
+		this._showFn = showFunction;
 	}
 
 	transform(fn) {
@@ -64,7 +64,7 @@ export default class AbstractInput {
 		return this.getId() === id ? this : null;
 	}
 
-	forEach(fn, options) {
+	perform(fn, options) {
 		fn(this, options);
 	}
 

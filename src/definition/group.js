@@ -4,12 +4,12 @@ import AbstractInput from "./abstractInput";
  * TODO: Write jsdoc
  */
 export default class Group extends AbstractInput {
-	constructor(id, showFn) {
+	constructor(id, showFunction) {
 		if (typeof id === "function") {
-			showFn = id; // eslint-disable-line no-param-reassign
+			showFunction = id; // eslint-disable-line no-param-reassign
 			id = null; // eslint-disable-line no-param-reassign
 		}
-		super(id, showFn);
+		super(id, showFunction);
 		this._children = [];
 	}
 
@@ -45,9 +45,9 @@ export default class Group extends AbstractInput {
 		return null;
 	}
 
-	forEach(fn, options) {
+	perform(fn, options) {
 		for (let child of this.getChildren(options)) {
-			child.forEach(fn, options);
+			child.perform(fn, options);
 		}
 	}
 }

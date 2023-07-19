@@ -115,20 +115,32 @@ export default class JoiValidation extends AbstractValidation {
 	}
 }
 
-function traverseObject(object, fn, prefix = "") {
-	for (let key of Object.keys(object)) {
-		let value = object[key];
+/**
+ * Recursively traverse a nested joi schema, and invoke `fn` on each
+ * value.
+ *
+ * @param {object} schema - Joi schema to traverse
+ * @param {Function} fn - Function to invoke on each value. The function is
+ *   called with `key`, `value` and `path`, where `path` uses dot-notation
+ * @param {string} path - Current path used to reach the schema being
+ *   traversed. When it is not empty, it ends with a dot
+ */
+function traverseObject(schema, fn, path = "") {
+	for (let key of Object.keys(schema)) {
+		let value = schema[key];
 		if (typeof value === "object" && !joi.isSchema(value)) {
-			traverseObject(object[key], fn, `${prefix + key}.`);
+			traverseObject(schema[key], fn, `${path + key}.`);
 		} else {
-			fn({ key, value, path: prefix + key });
+			fn({ key, value, path: path + key });
 		}
 	}
 }
 
 /**
+ * Group all errors in a literal object. Each pair has an input id as key, and
+ * the validation error of the input as value.
  *
- * @param error
+ * @param {object} error - Error object returned by Joi
  * @return {{}}
  */
 function gatherErrors(error) {

@@ -1,11 +1,5 @@
-import joi from "joi";
 import JoiValidation from "./validation/joiValidation";
 import JsonStateHandler from "./state/jsonStateHandler";
-import objectPath from "object-path";
-
-const validationOptions = {
-	allowUnknown: true
-};
 
 /**
  * TODO: Write jsdoc
@@ -35,9 +29,9 @@ export default class Form {
 	getValueFor(input, options) {
 		let id = input.getId();
 		let baseValue = this._stateHandler.get(this._state, id);
-		let formatFn = input.getFormatFn();
-		if (!formatFn) return baseValue;
-		return formatFn(baseValue, options);
+		let formatFunction = input.getFormatFn();
+		if (!formatFunction) return baseValue;
+		return formatFunction(baseValue, options);
 	}
 
 	setValueFor(id, value) {
@@ -100,7 +94,7 @@ export default class Form {
 
 	forEachInput(fn) {
 		for (let input of this._spec) {
-			input.forEach(fn, { state: this._state });
+			input.perform(fn, { state: this._state });
 		}
 	}
 }

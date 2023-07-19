@@ -24,16 +24,7 @@ export default class AbstractStateHandler {
 		objectPath.set(state, id, value);
 	}
 
-	/**
-	 * @abstract
-	 * @param {*} state -
-	 * @return {*}
-	 */
-	clone(state) {
-		return structuredClone(state);
-	}
-
-	convertForValidation({ state, validation, validator }) {
+	convertForValidation({ state: _, validation: __, validator: ___ }) {
 		throw new Error("[convertForValidation] Must be overridden");
 	}
 }

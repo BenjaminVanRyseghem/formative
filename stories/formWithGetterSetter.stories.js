@@ -1,5 +1,5 @@
 import { action } from "@storybook/addon-actions";
-import { spec, specForGetterSetter, validator } from "./utilities";
+import { specForGetterSetter, validator } from "./utilities";
 import Form from "../src/form";
 import GetterSetterStateHandler from "../src/state/getterSetterStateHandler";
 import HtmlRenderer from "../src/renderer/htmlRenderer";

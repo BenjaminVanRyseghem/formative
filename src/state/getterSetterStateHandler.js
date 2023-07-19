@@ -18,7 +18,7 @@ export default class GetterSetterStateHandler extends AbstractStateHandler {
 			let getter = result[name];
 			if (!getter) {
 				if (this._generateMissingFunctions) {
-					result[name] = function () {
+					result[name] = function get() {
 						// eslint-disable-line func-names
 						return this[`_${segment}`];
 					};
@@ -44,9 +44,9 @@ export default class GetterSetterStateHandler extends AbstractStateHandler {
 		let setter = lastObject[name];
 		if (!setter) {
 			if (this._generateMissingFunctions) {
-				lastObject[name] = function (val) {
+				lastObject[name] = function set(newValue) {
 					// eslint-disable-line func-names
-					this[`_${lastKey}`] = val;
+					this[`_${lastKey}`] = newValue;
 				};
 
 				setter = lastObject[name];

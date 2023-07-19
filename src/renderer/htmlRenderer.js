@@ -13,11 +13,11 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let children = this._visitSpec(form);
 		for (let child of children) {
 			if (child) {
-				result.appendChild(child);
+				result.append(child);
 			}
 		}
 
-		result.appendChild(this._createSubmitButton());
+		result.append(this._createSubmitButton());
 
 		return result;
 	}
@@ -41,19 +41,19 @@ export default class HtmlRenderer extends AbstractRenderer {
 
 		let { required } = options;
 		let result = document.createElement("div");
-		result.setAttribute("data-id", input.getId());
+		result.dataset.id = input.getId();
 
 		let label = input.getLabel(options);
 		if (label) {
 			let labelNode = document.createElement("label");
 			this._renderLabel(labelNode, label, required);
-			result.appendChild(labelNode);
+			result.append(labelNode);
 		}
 
 		let errorNode = document.createElement("div");
 		errorNode.classList.add("error-container");
 
-		result.appendChild(errorNode);
+		result.append(errorNode);
 
 		if (!shouldShow) {
 			result.style.display = "none";
@@ -97,10 +97,10 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let base = this.visitAbstractInput(input, options);
 
 		let node = document.createElement("section");
-		node.setAttribute("data-input", "true");
+		node.dataset.input = "true";
 
 		for (let child of children) {
-			node.appendChild(child);
+			node.append(child);
 		}
 
 		if (options.required) {
@@ -131,7 +131,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let base = this.visitAbstractInput(input, options);
 
 		let node = document.createElement("input");
-		node.setAttribute("data-input", "true");
+		node.dataset.input = "true";
 
 		if (value !== undefined && value !== "") {
 			node.setAttribute("value", value);
@@ -160,22 +160,18 @@ export default class HtmlRenderer extends AbstractRenderer {
 	}
 
 	_updateInput(input, existingNode, options) {
-		let { value } = options;
+		let { value, required } = options;
 		let shouldShow = input.shouldShow(options);
 
 		let label = input.getLabel(options);
 		let existingLabel = existingNode.querySelector("label");
-		this._renderLabel(existingLabel, label, options.required);
+		this._renderLabel(existingLabel, label, required);
 
 		if (value !== undefined && value !== "") {
 			existingNode.querySelector("[data-input]").value = value;
 		}
 
-		if (shouldShow) {
-			existingNode.style.display = "initial";
-		} else {
-			existingNode.style.display = "none";
-		}
+		existingNode.style.display = shouldShow ? "initial" : "none";
 	}
 
 	_createSelect(input, options) {
@@ -183,33 +179,14 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let base = this.visitAbstractInput(input, options);
 
 		let node = document.createElement("select");
-		node.setAttribute("data-input", "true");
+		node.dataset.input = "true";
 
 		if (value !== undefined && value !== "") {
 			node.setAttribute("value", value);
 		}
 
-		let selectedFound = false;
-
 		let selectOptions = input.getOptions();
-		for (let option of selectOptions) {
-			let optionNode = document.createElement("option");
-			optionNode.innerHTML = option.label;
-			optionNode.value = option.value;
-
-			if (value === option.value) {
-				optionNode.setAttribute("selected", "true");
-				selectedFound = true;
-			}
-
-			node.appendChild(optionNode);
-		}
-
-		if (!selectedFound) {
-			setTimeout(() => {
-				onChange(selectOptions[0].value);
-			}, 0);
-		}
+		this._appendOptions({ node, selectOptions, value, onChange });
 
 		node.addEventListener("change", (event) => {
 			onChange(event.target.value);
@@ -222,6 +199,27 @@ export default class HtmlRenderer extends AbstractRenderer {
 		base.insertBefore(node, base.lastChild);
 
 		return base;
+	}
+
+	_appendOptions({ node, value, selectOptions, onChange }) {
+		let selectedFound = false;
+		for (let option of selectOptions) {
+			let optionNode = document.createElement("option");
+			optionNode.innerHTML = option.label;
+			optionNode.value = option.value;
+
+			if (value === option.value) {
+				optionNode.setAttribute("selected", "true");
+				selectedFound = true;
+			}
+
+			node.append(optionNode);
+		}
+		if (!selectedFound) {
+			setTimeout(() => {
+				onChange(selectOptions[0].value);
+			}, 0);
+		}
 	}
 
 	_updateSelect(input, existingNode, options) {

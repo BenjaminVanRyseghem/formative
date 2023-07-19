@@ -3,7 +3,7 @@
  */
 export default class AbstractPlugin {
 	registerFunction(renderer, name, fn) {
-		let baseFn = renderer[name]?.bind(renderer);
-		renderer[name] = (...args) => fn.call(renderer, ...args, baseFn);
+		let baseFunction = renderer[name]?.bind(renderer);
+		renderer[name] = (...args) => fn.call(renderer, ...args, baseFunction);
 	}
 }

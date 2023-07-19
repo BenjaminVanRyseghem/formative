@@ -95,6 +95,7 @@ export default class AbstractRenderer {
 				this._stateChanged();
 			});
 
+			this._clearAllErrors();
 			if (error) {
 				this._appendError(id, error);
 			}
@@ -122,9 +123,7 @@ export default class AbstractRenderer {
 
 	_isStateLoading(input) {} // eslint-disable-line no-unused-vars
 
-	_stateChanged() {
-		this._clearAllErrors();
-	}
+	_stateChanged() {}
 
 	_clearAllErrors() {}
 

@@ -106,11 +106,11 @@ export const validator = {
 	showInfo: joi.valid("yes", "no"),
 	info: {
 		name: joi.string().empty("").trim().when("...showInfo", {
-			is: true,
+			is: "yes",
 			then: joi.required()
 		}),
 		lastName: joi.string().empty("").trim().when("...showInfo", {
-			is: true,
+			is: "yes",
 			then: joi.required()
 		})
 	}

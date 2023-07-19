@@ -24,6 +24,13 @@ export default class AbstractStateHandler {
 		objectPath.set(state, id, value);
 	}
 
+	/**
+	 * @abstract
+	 * @param {*} state - State to clone
+	 * @return {*} Clone of the state
+	 */
+	clone(state) {} // eslint-disable-line no-unused-vars
+
 	convertForValidation({ state: _, validation: __, validator: ___ }) {
 		throw new Error("[convertForValidation] Must be overridden");
 	}

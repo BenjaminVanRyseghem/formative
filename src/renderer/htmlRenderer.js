@@ -133,9 +133,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let node = document.createElement("input");
 		node.dataset.input = "true";
 
-		if (value !== undefined && value !== "") {
-			node.setAttribute("value", value);
-		}
+		this._setNodeValue({ node, value });
 
 		node.addEventListener("keyup", (event) => {
 			if (event.key === "Tab") return;
@@ -181,9 +179,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		let node = document.createElement("select");
 		node.dataset.input = "true";
 
-		if (value !== undefined && value !== "") {
-			node.setAttribute("value", value);
-		}
+		this._setNodeValue({ node, value });
 
 		let selectOptions = input.getOptions();
 		this._appendOptions({ node, selectOptions, value, onChange });
@@ -233,6 +229,14 @@ export default class HtmlRenderer extends AbstractRenderer {
 
 	_findNode(input) {
 		return this._formNode.querySelector(`[data-id='${input.getId()}']`);
+	}
+
+	_setNodeValue({ node, value }) {
+		Promise.resolve(value).then((resolvedValue) => {
+			if (resolvedValue !== undefined && resolvedValue !== "") {
+				node.setAttribute("value", resolvedValue);
+			}
+		});
 	}
 
 	_clearAllErrors() {

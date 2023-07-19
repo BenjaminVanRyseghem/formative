@@ -35,7 +35,7 @@ export default class Form {
 	}
 
 	setValueFor(id, value) {
-		this._stateHandler.set(this._state, id, value);
+		return this._stateHandler.set(this._state, id, value);
 	}
 
 	getState() {

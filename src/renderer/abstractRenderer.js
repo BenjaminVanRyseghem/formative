@@ -90,8 +90,10 @@ export default class AbstractRenderer {
 
 			let error = this._validateValue(id, value);
 
-			this._form.setValueFor(id, value);
-			this._stateChanged();
+			this._isStateLoading(input);
+			Promise.resolve(this._form.setValueFor(id, value)).then(() => {
+				this._stateChanged();
+			});
 
 			if (error) {
 				this._appendError(id, error);
@@ -117,6 +119,8 @@ export default class AbstractRenderer {
 			this._appendError(key, errors[key]);
 		}
 	}
+
+	_isStateLoading(input) {} // eslint-disable-line no-unused-vars
 
 	_stateChanged() {
 		this._clearAllErrors();

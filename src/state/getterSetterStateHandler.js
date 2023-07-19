@@ -58,6 +58,10 @@ export default class GetterSetterStateHandler extends AbstractStateHandler {
 		setter.call(lastObject, value);
 	}
 
+	clone(state) {
+		return state.clone();
+	}
+
 	convertForValidation({ state, validation, context }) {
 		return validation.convertGetterSetterState({ state, context });
 	}

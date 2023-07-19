@@ -43,6 +43,17 @@ class StateModel {
 	getInfo() {
 		return this._info;
 	}
+
+	clone() {
+		let instance = new this.constructor();
+		for (let key of Object.keys(this)) {
+			if (Object.hasOwn(this, key)) {
+				instance[key] = this[key];
+			}
+		}
+
+		return instance;
+	}
 }
 
 export const WithGetterStateHandler = {

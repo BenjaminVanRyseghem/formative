@@ -28,6 +28,10 @@ export default class AbstractRenderer {
 
 	visitSelect(_input, _options) {}
 
+	visitRadioGroup(_input, _options) {}
+
+	visitRadio(_input, _options) {}
+
 	visitGroup(input, options) {
 		return this._visitAllInputs(input.getChildren(options), options);
 	}
@@ -127,7 +131,7 @@ export default class AbstractRenderer {
 
 	_clearAllErrors() {}
 
-	_clearErrorFor(_id) {}
+	clearErrorFor(_id) {}
 
 	_appendError(_key, _error) {}
 

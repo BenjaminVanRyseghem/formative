@@ -44,6 +44,15 @@ export default class AbstractInput {
 		return this._resolve(this._label, options);
 	}
 
+	validationLabel(label) {
+		this._validationLabel = label;
+		return this;
+	}
+
+	getValidationLabel() {
+		return this._validationLabel ?? this._label;
+	}
+
 	shouldShow(options) {
 		if (typeof this._showFn === "function") {
 			return this._showFn(options);

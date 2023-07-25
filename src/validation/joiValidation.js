@@ -102,10 +102,10 @@ export default class JoiValidation extends AbstractValidation {
 			let inputValidator = objectPath.get(validator, id);
 			if (!inputValidator) return;
 
-			let label = input.getLabel(options);
+			let label = input.getValidationLabel(options);
 
 			let namedValidator = label
-				? inputValidator.label(input.getLabel())
+				? inputValidator.label(label)
 				: inputValidator;
 
 			objectPath.set(result, id, namedValidator);

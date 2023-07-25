@@ -1,4 +1,8 @@
+import { visitRadio, visitRadioGroup } from "./htmlRenderer/visitRadioGroup";
+import { visitSelect } from "./htmlRenderer/visitSelect";
 import AbstractRenderer from "./abstractRenderer";
+import visitGroup from "./htmlRenderer/visitGroup";
+import visitInput from "./htmlRenderer/visitInput";
 
 /**
  *
@@ -39,7 +43,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 	visitAbstractInput(input, options) {
 		let shouldShow = input.shouldShow(options);
 
-		let { required } = options;
+		let { required, noError } = options;
 		let result = document.createElement("div");
 		result.dataset.id = input.getId();
 
@@ -50,10 +54,12 @@ export default class HtmlRenderer extends AbstractRenderer {
 			result.append(labelNode);
 		}
 
-		let errorNode = document.createElement("div");
-		errorNode.classList.add("error-container");
+		if (!noError) {
+			let errorNode = document.createElement("div");
+			errorNode.classList.add("error-container");
 
-		result.append(errorNode);
+			result.append(errorNode);
+		}
 
 		if (!shouldShow) {
 			result.style.display = "none";
@@ -63,53 +69,24 @@ export default class HtmlRenderer extends AbstractRenderer {
 	}
 
 	visitInput(input, options) {
-		let existingNode = this._findNode(input);
-		if (existingNode) {
-			this._updateInput(input, existingNode, options);
-			return existingNode;
-		}
-
-		return this._createInput(input, options);
+		return visitInput(input, options, this);
 	}
 
 	visitSelect(input, options) {
-		let existingNode = this._findNode(input);
-		if (existingNode) {
-			this._updateSelect(input, existingNode, options);
-			return existingNode;
-		}
-
-		return this._createSelect(input, options);
+		return visitSelect(input, options, this);
 	}
 
 	visitGroup(input, options) {
-		let existingNode = this._findNode(input, options);
-		if (existingNode) {
-			this._updateGroup(input, existingNode, options);
-			return existingNode;
-		}
-
-		return this._createGroup(input, options);
+		let children = super.visitGroup(input, options);
+		return visitGroup(input, options, children, this);
 	}
 
-	_createGroup(input, options) {
-		let children = super.visitGroup(input, options);
-		let base = this.visitAbstractInput(input, options);
+	visitRadioGroup(input, options) {
+		return visitRadioGroup(input, options, this);
+	}
 
-		let node = document.createElement("section");
-		node.dataset.input = "true";
-
-		for (let child of children) {
-			node.append(child);
-		}
-
-		if (options.required) {
-			node.setAttribute("required", "true");
-		}
-
-		base.insertBefore(node, base.lastChild);
-
-		return base;
+	visitRadio(input, options) {
+		return visitRadio(input, options, this);
 	}
 
 	_renderLabel(node, label, required) {
@@ -126,38 +103,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		this._visitSpec(this._form);
 	}
 
-	_createInput(input, options) {
-		let { value, onChange, required, validate } = options;
-		let base = this.visitAbstractInput(input, options);
-
-		let node = document.createElement("input");
-		node.dataset.input = "true";
-
-		this._setNodeValue({ node, value });
-
-		node.addEventListener("keyup", (event) => {
-			if (event.key === "Tab") return;
-			onChange(event.target.value);
-		});
-
-		node.addEventListener("focus", () => {
-			this._clearErrorFor(input.getId());
-		});
-
-		node.addEventListener("blur", (event) => {
-			validate(event.target.value);
-		});
-
-		if (required) {
-			node.setAttribute("required", "true");
-		}
-
-		base.insertBefore(node, base.lastChild);
-
-		return base;
-	}
-
-	_updateInput(input, existingNode, options) {
+	updateInput(input, existingNode, options) {
 		let { value, required } = options;
 		let shouldShow = input.shouldShow(options);
 
@@ -172,32 +118,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		existingNode.style.display = shouldShow ? "initial" : "none";
 	}
 
-	_createSelect(input, options) {
-		let { value, onChange, required } = options;
-		let base = this.visitAbstractInput(input, options);
-
-		let node = document.createElement("select");
-		node.dataset.input = "true";
-
-		this._setNodeValue({ node, value });
-
-		let selectOptions = input.getOptions();
-		this._appendOptions({ node, selectOptions, value, onChange });
-
-		node.addEventListener("change", (event) => {
-			onChange(event.target.value);
-		});
-
-		if (required) {
-			node.setAttribute("required", "true");
-		}
-
-		base.insertBefore(node, base.lastChild);
-
-		return base;
-	}
-
-	_appendOptions({ node, value, selectOptions, onChange }) {
+	appendOptions({ node, value, selectOptions, onChange }) {
 		let selectedFound = false;
 		for (let option of selectOptions) {
 			let optionNode = document.createElement("option");
@@ -218,20 +139,11 @@ export default class HtmlRenderer extends AbstractRenderer {
 		}
 	}
 
-	_updateSelect(input, existingNode, options) {
-		this._updateInput(input, existingNode, options);
-	}
-
-	_updateGroup(input, existingNode, options) {
-		super.visitGroup(input, options);
-		this._updateInput(input, existingNode, options);
-	}
-
-	_findNode(input) {
+	findNode(input) {
 		return this._formNode.querySelector(`[data-id='${input.getId()}']`);
 	}
 
-	_setNodeValue({ node, value }) {
+	setNodeValue({ node, value }) {
 		Promise.resolve(value).then((resolvedValue) => {
 			if (resolvedValue !== undefined && resolvedValue !== "") {
 				node.setAttribute("value", resolvedValue);
@@ -246,7 +158,7 @@ export default class HtmlRenderer extends AbstractRenderer {
 		}
 	}
 
-	_clearErrorFor(id) {
+	clearErrorFor(id) {
 		let errorContainer = this._formNode.querySelector(
 			`[data-id='${id}'] .error-container`
 		);

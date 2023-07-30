@@ -9,7 +9,7 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
-    "@benjamin-vanryseghem/eslint-config": "^1.0.1",
+    "@benjamin-vanryseghem/eslint-config": "^1.0.2",
     "@storybook/addon-actions": "^7.1.0",
     "@storybook/addon-essentials": "^7.1.0",
     "@storybook/addon-interactions": "^7.1.0",

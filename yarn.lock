@@ -1162,10 +1162,10 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     to-fast-properties "^2.0.0"
 
-"@benjamin-vanryseghem/eslint-config@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@benjamin-vanryseghem/eslint-config/-/eslint-config-1.0.1.tgz#346fc75a4ef3a120555e61ff650012a058e3f24a"
-  integrity sha512-tLgfcnO2rR7dWufoiR5ffAXPAhqUGRcA+PPJBwfN2FkEcL98SETj/iZ3efGLVUHER//37l6NsYwEFjwBqPl5jQ==
+"@benjamin-vanryseghem/eslint-config@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@benjamin-vanryseghem/eslint-config/-/eslint-config-1.0.2.tgz#4ce8a469326982a97d66375b6adaa11471b08397"
+  integrity sha512-XrVhIzL25Hf4VvnZiut2ED2veKH+E6QYOeGiXpB9Qlj/M8NsY86R7SL879oWftJhLcZQMm5HDeEBlqVzoexvuA==
 
 "@colors/colors@1.5.0":
   version "1.5.0"

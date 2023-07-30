@@ -1,14 +1,33 @@
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
 export function visitSelect(input, options, renderer) {
 	let existingNode = renderer.findNode(input);
 	if (existingNode) {
-		_updateSelect(input, existingNode, options, renderer);
+		updateSelect({
+			input,
+			existingNode,
+			options,
+			renderer
+		});
 		return existingNode;
 	}
 
-	return _createSelect(input, options, renderer);
+	return createSelect(input, options, renderer);
 }
 
-function _createSelect(input, options, renderer) {
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+function createSelect(input, options, renderer) {
 	let { value, onChange, required } = options;
 	let base = renderer.visitAbstractInput(input, options);
 
@@ -33,6 +52,14 @@ function _createSelect(input, options, renderer) {
 	return base;
 }
 
-function _updateSelect(input, existingNode, options, renderer) {
+/**
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {HTMLElement} args.existingNode - HTMLElement to update
+ * @param {object} args.options - Rendering options
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ */
+function updateSelect({ input, existingNode, options, renderer }) {
 	renderer.updateInput(input, existingNode, options);
 }

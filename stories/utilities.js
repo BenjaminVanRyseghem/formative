@@ -4,10 +4,22 @@ import joi from "joi";
 import RadioGroup, { Radio } from "../src/definition/radioGroup";
 import Select from "../src/definition/select";
 
+/**
+ * Helper function generating a spec.
+ *
+ * @param {object} args - Object parameter
+ * @param {Function} args.infoShowPredicate - Predicate returning true when
+ *   then info group should be displayed
+ * @param {Function} args.lastNameShowPredicate - Predicate returning true when
+ *   the last-name input should be displayed
+ * @param {Function} args.surNameShowPredicate - Predicate returning true when
+ *   the surname input should be displayed
+ * @return {AbstractInput[]} Form spec
+ */
 function makeSpec({
-	infoShowFunction = ({ state }) => state.showInfo === "yes",
-	lastNameShowFunction = ({ state }) => !!state.info?.name,
-	surNameShowFunction = ({ state }) => state.info?.gender === "male"
+	infoShowPredicate = ({ state }) => state.showInfo === "yes",
+	lastNameShowPredicate = ({ state }) => !!state.info?.name,
+	surNameShowPredicate = ({ state }) => state.info?.gender === "male"
 } = {}) {
 	return [
 		new Input("phone")
@@ -46,7 +58,7 @@ function makeSpec({
 			.radio(new Radio("apple").label("Apple"))
 			.radio(new Radio("orange").label("Orange"))
 			.radio(new Radio("pineapple").label("Pineapple")),
-		new Group("info", infoShowFunction)
+		new Group("info", infoShowPredicate)
 			.label("Info")
 			.children(
 				new Select("gender")
@@ -54,8 +66,8 @@ function makeSpec({
 					.option("Male", "male")
 					.option("Female", "female"),
 				new Input("name").label("Name"),
-				new Input("lastName", lastNameShowFunction).label("Last Name"),
-				new Input("surname", surNameShowFunction).label("Surname")
+				new Input("lastName", lastNameShowPredicate).label("Last Name"),
+				new Input("surname", surNameShowPredicate).label("Surname")
 			)
 	];
 }
@@ -77,7 +89,7 @@ export const validator = {
 
 export const spec = makeSpec();
 export const specForGetterSetter = makeSpec({
-	infoShowFunction: ({ state }) => state.getShowInfo() === "yes",
-	lastNameShowFunction: ({ state }) => !!state.getInfo()?.getName(),
-	surNameShowFunction: ({ state }) => state.getInfo()?.getGender() === "male"
+	infoShowPredicate: ({ state }) => state.getShowInfo() === "yes",
+	lastNameShowPredicate: ({ state }) => !!state.getInfo()?.getName(),
+	surNameShowPredicate: ({ state }) => state.getInfo()?.getGender() === "male"
 });

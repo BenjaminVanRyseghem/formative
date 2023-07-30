@@ -2,10 +2,6 @@
  * TODO: Write jsdoc
  */
 export default class AbstractValidation {
-	/**
-	 * @abstract
-	 * @return {boolean}
-	 */
 	isRequired({ id: _, stateHandler: __, state: ___, validator: ____ }) {}
 
 	makeValidateFor({

@@ -78,7 +78,12 @@ export default class HtmlRenderer extends AbstractRenderer {
 
 	visitGroup(input, options) {
 		let children = super.visitGroup(input, options);
-		return visitGroup(input, options, children, this);
+		return visitGroup({
+			input,
+			options,
+			children,
+			renderer: this
+		});
 	}
 
 	visitRadioGroup(input, options) {

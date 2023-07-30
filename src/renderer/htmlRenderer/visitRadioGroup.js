@@ -1,24 +1,55 @@
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
 export function visitRadioGroup(input, options, renderer) {
 	let existingNode = renderer.findNode(input, options);
 	if (existingNode) {
-		_updateRadioGroup(input, existingNode, options, renderer);
+		updateRadioGroup({
+			input,
+			existingNode,
+			options,
+			renderer
+		});
 		return existingNode;
 	}
 
-	return _createRadioGroup(input, options, renderer);
+	return createRadioGroup(input, options, renderer);
 }
 
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
 export function visitRadio(input, options, renderer) {
 	let existingNode = renderer.findNode(input, options);
 	if (existingNode) {
-		_updateRadio(input, existingNode, options);
+		updateRadio({
+			input,
+			existingNode,
+			options,
+			renderer
+		});
 		return existingNode;
 	}
 
-	return _createRadio(input, options, renderer);
+	return createRadio(input, options, renderer);
 }
 
-function _createRadioGroup(input, options, renderer) {
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+function createRadioGroup(input, options, renderer) {
 	let children = renderer.visitAll(input.getChildren(), {
 		...options,
 		name: input.getId()
@@ -41,7 +72,15 @@ function _createRadioGroup(input, options, renderer) {
 	return base;
 }
 
-function _updateRadioGroup(input, existingNode, options, renderer) {
+/**
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {HTMLElement} args.existingNode - HTMLElement to update
+ * @param {object} args.options - Rendering options
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ */
+function updateRadioGroup({ input, existingNode, options, renderer }) {
 	renderer.visitAll(input.getChildren(), {
 		...options,
 		name: input.getId()
@@ -50,7 +89,14 @@ function _updateRadioGroup(input, existingNode, options, renderer) {
 	renderer.updateInput(input, existingNode, options);
 }
 
-function _createRadio(input, options, renderer) {
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+function createRadio(input, options, renderer) {
 	let base = renderer.visitAbstractInput(input, {
 		...options,
 		required: false,
@@ -74,6 +120,14 @@ function _createRadio(input, options, renderer) {
 	return base;
 }
 
-function _updateRadio(input, existingNode, options, renderer) {
+/**
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {HTMLElement} args.existingNode - HTMLElement to update
+ * @param {object} args.options - Rendering options
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ */
+function updateRadio({ input, existingNode, options, renderer }) {
 	renderer.updateInput(input, existingNode, options);
 }

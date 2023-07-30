@@ -1,3 +1,10 @@
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
 export default function visitInput(input, options, renderer) {
 	let existingNode = renderer.findNode(input);
 	if (existingNode) {
@@ -5,10 +12,17 @@ export default function visitInput(input, options, renderer) {
 		return existingNode;
 	}
 
-	return _createInput(input, options, renderer);
+	return createInput(input, options, renderer);
 }
 
-function _createInput(input, options, renderer) {
+/**
+ *
+ * @param {Group} input - Input to visit
+ * @param {object} options - Rendering options
+ * @param {HtmlRenderer} renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+function createInput(input, options, renderer) {
 	let { value, onChange, required, validate } = options;
 	let base = renderer.visitAbstractInput(input, options);
 

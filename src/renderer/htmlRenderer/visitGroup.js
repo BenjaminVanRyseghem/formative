@@ -1,14 +1,44 @@
-export default function visitGroup(input, options, children, renderer) {
+/**
+ * Render a Group as an HTML element.
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {object} args.options - Rendering options
+ * @param {AbstractInput[]} args.children - List of group children inputs
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+export default function visitGroup({ input, options, children, renderer }) {
 	let existingNode = renderer.findNode(input, options);
 	if (existingNode) {
-		_updateGroup(input, existingNode, options, renderer);
+		updateGroup({
+			input,
+			existingNode,
+			options,
+			renderer
+		});
 		return existingNode;
 	}
 
-	return _createGroup(input, options, children, renderer);
+	return createGroup({
+		input,
+		options,
+		children,
+		renderer
+	});
 }
 
-function _createGroup(input, options, children, renderer) {
+/**
+ * Create a section HTMLElement.
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {object} args.options - Rendering options
+ * @param {AbstractInput[]} args.children - List of group children inputs
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ * @return {HTMLElement} - HTMLElement
+ */
+function createGroup({ input, options, children, renderer }) {
 	let base = renderer.visitAbstractInput(input, options);
 
 	let node = document.createElement("section");
@@ -27,6 +57,15 @@ function _createGroup(input, options, children, renderer) {
 	return base;
 }
 
-function _updateGroup(input, existingNode, options, renderer) {
+/**
+ * Update an existing section.
+ *
+ * @param {object} args - Object parameter
+ * @param {Group} args.input - Input to visit
+ * @param {HTMLElement} args.existingNode - HTMLElement to update
+ * @param {object} args.options - Rendering options
+ * @param {HtmlRenderer} args.renderer - Renderer initiating the visit
+ */
+function updateGroup({ input, existingNode, options, renderer }) {
 	renderer.updateInput(input, existingNode, options);
 }

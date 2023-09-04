@@ -2464,6 +2464,14 @@
     "@storybook/client-logger" "7.1.0"
     "@storybook/preview-api" "7.1.0"
 
+"@storybook/core-client@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@storybook/core-client/-/core-client-7.4.0.tgz#b2b683ebc44d0dfaa7a886f7bb1a5fc74a3d0965"
+  integrity sha512-AhysJS2HnydB8Jc+BMVzK5VLHa1liJjxroNsd+ZTgGUhD7R8wvozrswQgY4MLFtcaLwN/wDWlK2YavSBqmc94Q==
+  dependencies:
+    "@storybook/client-logger" "7.4.0"
+    "@storybook/preview-api" "7.4.0"
+
 "@storybook/core-common@7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@storybook/core-common/-/core-common-7.1.0.tgz#24cf225a9c025184e2f3af25d67397d22ad125d2"
@@ -2690,6 +2698,18 @@
     doctrine "^3.0.0"
     lodash "^4.17.21"
 
+"@storybook/docs-tools@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@storybook/docs-tools/-/docs-tools-7.4.0.tgz#d9109c9c8ec4e90bb24d1acfcc16834a252618eb"
+  integrity sha512-DzXmt4JorAOePoS+sjQznf8jLPI9D5mdB1eSXjfvmGBQyyehKTZv5+TXuxYvT3iPN4rW4OPrIrQCSIrbULFdwA==
+  dependencies:
+    "@storybook/core-common" "7.4.0"
+    "@storybook/preview-api" "7.4.0"
+    "@storybook/types" "7.4.0"
+    "@types/doctrine" "^0.0.3"
+    doctrine "^3.0.0"
+    lodash "^4.17.21"
+
 "@storybook/global@^5.0.0":
   version "5.0.0"
   resolved "https://registry.npmjs.org/@storybook/global/-/global-5.0.0.tgz"
@@ -2710,7 +2730,7 @@
     "@storybook/preview-web" "7.1.0"
     magic-string "^0.30.0"
 
-"@storybook/html@7.1.0", "@storybook/html@^7.1.0":
+"@storybook/html@7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@storybook/html/-/html-7.1.0.tgz#9ce809a76f17cb429f577c30c704a730c724ae91"
   integrity sha512-g1mgRbkwsQs3ogeYt+qZZx9oQkmJvPf6QukXuqtALtDvp5k9meG5NG22TNv32s/VBnU0/cxhT6Fjh+GN5F7NsA==
@@ -2720,6 +2740,18 @@
     "@storybook/global" "^5.0.0"
     "@storybook/preview-api" "7.1.0"
     "@storybook/types" "7.1.0"
+    ts-dedent "^2.0.0"
+
+"@storybook/html@^7.1.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@storybook/html/-/html-7.4.0.tgz#d3c2d66a6c41ce5b82a26482b86f0ee2f4c572d2"
+  integrity sha512-Ipm2ZEV69j6d6SmmaknW5EPuXZaTuRTP88y3cDCqy4VZ22cmDurpBgMEq+yKSEBONI4OKUixGcmJzU86lwF+4A==
+  dependencies:
+    "@storybook/core-client" "7.4.0"
+    "@storybook/docs-tools" "7.4.0"
+    "@storybook/global" "^5.0.0"
+    "@storybook/preview-api" "7.4.0"
+    "@storybook/types" "7.4.0"
     ts-dedent "^2.0.0"
 
 "@storybook/instrumenter@7.4.0":
